@@ -12,3 +12,5 @@ Build an app which let you know more about **MERN** Development.
 
    ***
    
+   - **Features**
+     - Build an api and teasted successfully through postman (CRUD)
