@@ -1,6 +1,9 @@
 const express = require( "express" );
 const app = express();
+const cors = require( "cors" );
 app.use( express.json() );
+app.use( cors() );
+
 
 const { initializeDatabase } = require( "./db/db.connect" );
 const NewBook = require( "./models/book.model" )
@@ -20,9 +23,9 @@ const seedBooks = () => {
 }
 seedBooks() */
 
-app.get("/",(req,res)=>{
-    res.send("Hello, Welcome to CRUD expressJs app. (MERN SETUP)")
-})
+app.get( "/", ( req, res ) => {
+    res.send( "Hello, Welcome to CRUD expressJs app. (MERN SETUP)" )
+} )
 
 /* 1. Create an API with route "/books" to create a new book data in the books Database. Make sure to do error handling. Test your API with Postman. Add the following book:*/
 
