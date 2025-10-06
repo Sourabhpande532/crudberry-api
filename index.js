@@ -20,6 +20,10 @@ const seedBooks = () => {
 }
 seedBooks() */
 
+app.get("/",(req,res)=>{
+    res.send("Hello, Welcome to CRUD expressJs app. (MERN SETUP)")
+})
+
 /* 1. Create an API with route "/books" to create a new book data in the books Database. Make sure to do error handling. Test your API with Postman. Add the following book:*/
 
 async function addBookToDatabase( newBook ) {
@@ -177,7 +181,7 @@ Updated book rating: { "rating": 4.5 } */
 
 const updateBookByRating = async ( bookId, dataToUpdat ) => {
     try {
-        const updatedBook = await NewBook.findByIdAndUpdate( bookId, dataToUpdat, {new:true} )
+        const updatedBook = await NewBook.findByIdAndUpdate( bookId, dataToUpdat, { new: true } )
         return updatedBook
     } catch ( error ) {
         console.log( "Failed to update book.", error.message );
@@ -200,7 +204,50 @@ app.post( "/api/books/:bookId", async ( req, res ) => {
 /* 9. Create an API to update a book's rating with the help of its title. Update the details of the book "Shoe Dog". Use the query .findOneAndUpdate() for this. Send an error message "Book does not exist", in case that book is not found. Make sure to do error handling.
 Updated book data: { "publishedYear": 2017, "rating": 4.2 } */
 
+async function updateBookByTitle( bookTitle, dataToUpdate ) {
+    try {
+        const book = await NewBook.findOneAndUpdate( { title: bookTitle }, dataToUpdate, { new: true } )
+        return book
+    } catch ( error ) {
+        console.log( "Failed to update title.", error.message );
+        throw error
+    }
+}
 
+app.post( "/api/books/title/:bookTitle", async ( req, res ) => {
+    try {
+        const updatedBook = await updateBookByTitle( req.params.bookTitle, req.body );
+        if ( !updatedBook ) {
+            return res.status( 404 ).json( { success: false, message: "Book doesn't exits." } )
+        } else {
+            res.status( 200 ).json( { success: true, message: "Successfully updated!", data: updatedBook } )
+        }
+    } catch ( error ) {
+        return res.status( 500 ).json( { success: false, message: "Server error, Failed to update book by title", error } )
+    }
+} )
+
+/*10. Create an API to delete a book with the help of a book id, Send an error message "Book not found" in case the book does not exist. Make sure to do error handling. */
+
+async function deleteBookById( bookId ) {
+    try {
+        const deletedBook = await NewBook.findByIdAndDelete( bookId )
+        return deletedBook;
+    } catch ( error ) {
+        console.log( "Failed to delete book.", error );
+        throw error
+    }
+}
+
+app.delete( "/api/deletebook/:bookId", async ( req, res ) => {
+    try {
+        const deletedBook = await deleteBookById( req.params.bookId );
+        if ( !deletedBook ) return res.status( 404 ).json( "Book not found." )
+        return res.status( 200 ).json( { success: true, message: "Deleted successfully!", data: deletedBook } )
+    } catch ( error ) {
+        res.status( 500 ).json( { success: false, message: "Server error, while deleting book." } )
+    }
+} )
 
 const PORT = process.env.PORT || 3000;
 app.listen( PORT, () => {
