@@ -1,9 +1,14 @@
 const express = require( "express" );
 const app = express();
 const cors = require( "cors" );
-app.use( express.json() );
-app.use( cors() );
+const corsOptions = {
+    origin: "*",
+    credentials: true,
+    optionSuccessStatus: 200,
+};
 
+app.use( express.json() );
+app.use( cors( corsOptions ) );
 
 const { initializeDatabase } = require( "./db/db.connect" );
 const NewBook = require( "./models/book.model" )
@@ -26,7 +31,6 @@ seedBooks() */
 app.get( "/", ( req, res ) => {
     res.send( "Hello, Welcome to CRUD expressJs app. (MERN SETUP)" )
 } )
-
 /* 1. Create an API with route "/books" to create a new book data in the books Database. Make sure to do error handling. Test your API with Postman. Add the following book:*/
 
 async function addBookToDatabase( newBook ) {
@@ -67,7 +71,7 @@ app.get( "/api/books", async ( req, res ) => {
     try {
         const books = await getAllBooks();
         if ( books.length != 0 ) {
-            res.status( 200 ).json( { success: true, message: "Successfully Fetched all books.", data: books } )
+            res.status( 200 ).json( books )
         } else {
             res.status( 404 ).json( { error: "book not found." } )
         }
@@ -88,10 +92,10 @@ const getBookByTitle = async ( bookTitle ) => {
     }
 }
 
-app.get( "/api/books/:bookId", async ( req, res ) => {
+app.get( "/api/books/:bookTitle", async ( req, res ) => {
     try {
-        const book = await getBookByTitle( req.params.bookId )
-        res.status( 200 ).json( { success: true, message: "Successfully fetch book by title.", data: book } )
+        const book = await getBookByTitle( req.params.bookTitle )
+        res.status( 200 ).json( book )
     } catch ( error ) {
         console.log( "Internal server error while fetching book", error.message );
         res.status( 500 ).json( { success: false, message: "Internal server error while fetching book." } )
@@ -109,16 +113,11 @@ const getBooksByAuthor = async ( authorName ) => {
         throw error;
     }
 }
-
 app.get( "/api/books/author/:authorName", async ( req, res ) => {
     try {
         const authorBooks = await getBooksByAuthor( req.params.authorName );
         if ( authorBooks.length > 0 ) {
-            return res.status( 200 ).json( {
-                success: true,
-                message: "Successfully Fetch book by author",
-                data: authorBooks
-            } )
+            return res.status( 200 ).json( authorBooks )
         }
         return res.status( 404 ).json( { success: false, message: "book not found." } );
 
